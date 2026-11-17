@@ -4,7 +4,8 @@ services:
     runtime: node
     rootDir: backend
     plan: free
-    buildCommand: npm ci && npx prisma generate && npm run build
+    # Install build tools even with NODE_ENV=production; remove them after compilation.
+    buildCommand: npm ci --include=dev && npx prisma generate && npm run build && npm prune --omit=dev
     startCommand: npm run start:prod
     autoDeploy: false
     envVars:
