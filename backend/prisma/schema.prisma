@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum PlanType {
+  MONTHLY
+  QUARTERLY
+  SEMIANNUAL
+  ANNUAL
+}
+
+enum MembershipStatus {
+  ACTIVE
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  BANK_TRANSFER
+  OTHER
+}
+
+model User {
+  id          String       @id @default(uuid()) @db.Uuid
+  name        String       @db.VarChar(160)
+  document    String?      @unique @db.VarChar(40)
+  phone       String?      @db.VarChar(30)
+  email       String       @unique @db.VarChar(254)
+  passwordHash String?     @map("password_hash") @db.VarChar(255)
+  createdAt   DateTime?    @default(now()) @map("created_at") @db.Timestamptz(3)
+  memberships Membership[]
+  payments    Payment[]
+
+  @@map("usuarios")
+}
+
+model Plan {
+  id           String       @id @default(uuid()) @db.Uuid
+  type         PlanType     @unique
+  durationDays Int          @map("duration_days")
+  price        Decimal      @db.Decimal(10, 2)
+  memberships  Membership[]
+
+  @@map("planes")
+}
+
+model Membership {
+  id             String           @id @default(uuid()) @db.Uuid
+  userId         String           @map("user_id") @db.Uuid
+  planId         String           @map("plan_id") @db.Uuid
+  startDate      DateTime         @map("start_date") @db.Timestamptz(3)
+  expirationDate DateTime         @map("expiration_date") @db.Timestamptz(3)
+  amount         Decimal          @db.Decimal(10, 2)
+  status         MembershipStatus @default(ACTIVE)
+  user           User             @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  plan           Plan             @relation(fields: [planId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  payments       Payment[]
+
+  @@unique([id, userId], map: "memberships_id_user_id_key")
+  @@index([userId])
+  @@index([planId])
+  @@index([status, expirationDate])
+  @@map("membresias")
+}
+
+model Payment {
+  id           String        @id @default(uuid()) @db.Uuid
+  userId       String        @map("user_id") @db.Uuid
+  membershipId String        @map("membership_id") @db.Uuid
+  paidAt       DateTime      @default(now()) @map("paid_at") @db.Timestamptz(3)
+  amount       Decimal       @db.Decimal(10, 2)
+  method       PaymentMethod
+  user         User          @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  membership   Membership    @relation(fields: [membershipId, userId], references: [id, userId], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([userId])
+  @@index([membershipId])
+  @@index([paidAt])
+  @@map("pagos")
+}
+
+model Admin {
+  id           String @id @default(uuid()) @db.Uuid
+  email        String @unique @db.VarChar(254)
+  passwordHash String @map("password_hash") @db.VarChar(255)
+
+  @@map("administradores")
+}

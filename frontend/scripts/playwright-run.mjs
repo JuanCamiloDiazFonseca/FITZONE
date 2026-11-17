@@ -1,0 +1,10 @@
+import { spawnSync } from 'node:child_process';
+import path from 'node:path';
+import os from 'node:os';
+import { fileURLToPath } from 'node:url';
+const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+const env = { ...process.env, PLAYWRIGHT_BROWSERS_PATH: process.env.PLAYWRIGHT_BROWSERS_PATH || path.join(os.tmpdir(), 'fitzone-playwright-browsers') };
+const cli = path.join(scriptDir, '../node_modules/@playwright/test/cli.js');
+const result = spawnSync(process.execPath, [cli, ...process.argv.slice(2)], { cwd: path.join(scriptDir, '..'), env, stdio: 'inherit' });
+if (result.error) console.error('No se pudo iniciar Playwright.');
+process.exitCode = result.status ?? 1;

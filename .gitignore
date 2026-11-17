@@ -1,0 +1,43 @@
+# Dependencies and generated output
+**/node_modules/
+**/.next/
+**/dist/
+**/build/
+**/coverage/
+**/out/
+**/.vercel/
+**/*.tsbuildinfo
+
+# Environment files and credentials
+**/.env
+**/.env.*
+!**/.env.example
+**/*secret*
+**/*credential*
+**/*service-role*
+**/*service_role*
+*.pem
+*.key
+
+# Local temporary files, logs, and backups
+**/.npm-cache/
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/pnpm-debug.log*
+**/*.log
+**/*.tmp
+**/*.temp
+**/*.bak
+**/*.backup
+**/*.old
+**/*~
+.DS_Store
+Thumbs.db
+
+# Disposable application copies for isolated E2E; never commit credentials or dependencies.
+/.e2e-e23/
+
+# Academic evidence contains generated traces, screenshots, exports, and archives.
+# Keep it on disk, but review files individually before sharing outside this project.
+/evidencias/
